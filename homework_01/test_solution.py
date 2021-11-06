@@ -1,5 +1,8 @@
-from solution import solution
+from solution import solution, Turn
 
 
 def test_solution_with_provided_example():
-    assert 1 == 1
+    turns_count, turns = solution(8, -1, [1, 2, 3, 4, 5, 6, 0, 7, 8])
+
+    assert turns_count == 2
+    assert turns == [Turn.left, Turn.left]
