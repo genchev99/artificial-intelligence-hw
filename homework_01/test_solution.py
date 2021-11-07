@@ -34,3 +34,47 @@ def test_solution_01():
 
     assert turns_count == 4
     assert turns == [Turn.left, Turn.up, Turn.left, Turn.up]
+
+
+def test_solution_02():
+    turns_count, turns = solution(8, -1, [2, 3, 0, 5, 1, 8, 4, 7, 6])
+
+    assert turns_count == 16
+    assert turns == [
+        Turn.right,
+        Turn.right,
+        Turn.up,
+        Turn.left,
+        Turn.left,
+        Turn.down,
+        Turn.right,
+        Turn.right,
+        Turn.up,
+        Turn.up,
+        Turn.left,
+        Turn.down,
+        Turn.down,
+        Turn.left,
+        Turn.up,
+        Turn.up,
+    ]
+
+
+def test_solution_03():
+    turns_count, turns = solution(8, -1, [0, 5, 3, 2, 4, 6, 7, 1, 8])
+
+    assert turns_count == 12
+    assert turns == [
+        Turn.up,
+        Turn.left,
+        Turn.up,
+        Turn.right,
+        Turn.down,
+        Turn.left,
+        Turn.down,
+        Turn.right,
+        Turn.up,
+        Turn.up,
+        Turn.left,
+        Turn.left,
+    ]
