@@ -1,5 +1,6 @@
 import json
 import math
+import time
 from functools import cached_property
 
 IDA_THRESHOLD_LIMIT = 200000
@@ -23,6 +24,8 @@ class MatrixHelper:
     def __init__(self, numbers: list):
         self.__side_length = int(len(numbers) ** 0.5)
         self.__numbers = numbers
+
+        self.__validate_board()
 
     def __get_expected_position_for_number(self, number) -> int:
         if number == 0:
@@ -66,6 +69,10 @@ class MatrixHelper:
     def __successor_helper(self, moved_zero_position):
         order = self.__numbers.copy()
         return swap(order, self.__current_zero_position, moved_zero_position)
+
+    def __validate_board(self):
+        # TODO: implement validation
+        pass
 
     def iter_successor(self):
         zero_x, zero_y = self.__position_to_coords(self.__current_zero_position)
@@ -121,14 +128,18 @@ class ThresholdSurpassedException(Exception):
     pass
 
 
-def iterative_deepening_a_star_rec(tree, node: Node, directions: list, distance, threshold):
-    print("Visiting Node " + str(node))
+def iterative_deepening_a_star_rec(tree, node: Node, visited: set, directions: list, distance, threshold):
+    if node.id in visited:
+        return math.inf, directions
+
     if node.matrix.is_ordered():
         return -distance, directions
 
     estimate = distance + node.heuristic
     if estimate > threshold:
         return estimate, directions
+
+    visited.add(node.id)
 
     # If not then we discover the next variations of the board and update the tree with them
     for direction, order in node.matrix.iter_successor():
@@ -143,6 +154,7 @@ def iterative_deepening_a_star_rec(tree, node: Node, directions: list, distance,
         new_distance, new_directions = iterative_deepening_a_star_rec(
             tree=tree,
             node=tree.nodes[child_id],
+            visited=visited,
             directions=[*directions, direction],
             distance=distance + 1,
             threshold=threshold,
@@ -159,9 +171,14 @@ def iterative_deepening_a_star(tree: Tree, start: Node):
     threshold = start.heuristic
 
     while True:
-        print("Iteration with threshold: " + str(threshold))
-        distance, directions = iterative_deepening_a_star_rec(tree, start, directions=[], distance=0, threshold=threshold)
-        print(f"distance: {distance}, directions: {directions}")
+        distance, directions = iterative_deepening_a_star_rec(
+            tree,
+            start,
+            visited=set(),
+            directions=[],
+            distance=0,
+            threshold=threshold
+        )
 
         if distance <= 0:
             return -distance, directions
@@ -186,16 +203,26 @@ def solution(n: int, expected_zero_index: int, numbers: list) -> tuple:
     matrix = MatrixHelper(numbers)
     start = Node(matrix)
     tree = Tree(start)
-    res = iterative_deepening_a_star(tree, start)
-    print(tree)
-    return res
-    # print(matrix.manhattan_score)
-    # print(list(matrix.iter_successor()))
-    #
+    return iterative_deepening_a_star(tree, start)
 
 
 def main():
-    print(solution(8, -1, [1, 2, 3, 4, 5, 6, 0, 7, 8]))
+    n = int(input("Input N: "))
+    i = int(input("Input I: "))
+    numbers = []
+    for row_number in range(int((n + 1) ** 0.5)):
+        row = input(f"Input row #{row_number + 1} separated with spaces: ")
+        numbers += [int(number) for number in str(row).split(" ")]
+
+    start = time.time()
+    distance, directions = solution(n, i, numbers)
+    end = time.time()
+    # print the expected output
+    print(distance)
+    for direction in directions:
+        print(direction)
+
+    print("Execution time in seconds: " + "{:.2f}".format(end - start))
 
 
 if __name__ == '__main__':
