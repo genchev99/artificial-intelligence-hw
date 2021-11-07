@@ -151,6 +151,9 @@ def iterative_deepening_a_star_rec(tree, node: Node, visited: set, directions: l
     min_distance = math.inf
     min_directions = []
     for direction, child_id in tree.edges[node.id].items():
+        if child_id in visited:
+            continue
+
         new_distance, new_directions = iterative_deepening_a_star_rec(
             tree=tree,
             node=tree.nodes[child_id],
@@ -219,8 +222,8 @@ def main():
     end = time.time()
     # print the expected output
     print(distance)
-    for direction in directions:
-        print(direction)
+    for index, direction in enumerate(directions):
+        print(index, direction)
 
     print("Execution time in seconds: " + "{:.2f}".format(end - start))
 
