@@ -1,4 +1,4 @@
-from solution import solution, Turn
+from homework_01.solution import solution, Turn
 
 
 def test_solution_with_provided_example():
