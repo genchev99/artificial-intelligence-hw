@@ -81,10 +81,10 @@ class MatrixHelper:
 
 
 class Node:
-    def __init__(self, matrix: MatrixHelper):
+    def __init__(self, matrix: MatrixHelper, parent_heuristic: int = 0):
         self.matrix = matrix
         self.id = matrix.identifier
-        self.heuristic = matrix.manhattan_score
+        self.heuristic = parent_heuristic + matrix.manhattan_score
 
     def __str__(self):
         return f"({self.id}): {self.heuristic}"
@@ -132,7 +132,7 @@ def iterative_deepening_a_star_rec(tree, node: Node, directions: list, distance,
 
     # If not then we discover the next variations of the board and update the tree with them
     for direction, order in node.matrix.iter_successor():
-        tree.add_child(parent_id=node.id, direction=direction, child=Node(MatrixHelper(order)))
+        tree.add_child(parent_id=node.id, direction=direction, child=Node(MatrixHelper(order), parent_heuristic=node.heuristic))
 
     if not tree.edges[node.id]:
         return math.inf, directions
@@ -163,7 +163,7 @@ def iterative_deepening_a_star(tree: Tree, start: Node):
         distance, directions = iterative_deepening_a_star_rec(tree, start, directions=[], distance=0, threshold=threshold)
         print(f"distance: {distance}, directions: {directions}")
 
-        if distance < 0:
+        if distance <= 0:
             return -distance, directions
         elif 0 < distance < IDA_THRESHOLD_LIMIT:
             # prevents stucking on unsolvable puzzles
@@ -186,12 +186,12 @@ def solution(n: int, expected_zero_index: int, numbers: list) -> tuple:
     matrix = MatrixHelper(numbers)
     start = Node(matrix)
     tree = Tree(start)
-
-    return iterative_deepening_a_star(tree, start)
-
+    res = iterative_deepening_a_star(tree, start)
+    print(tree)
+    return res
     # print(matrix.manhattan_score)
     # print(list(matrix.iter_successor()))
-    # print(tree)
+    #
 
 
 def main():
