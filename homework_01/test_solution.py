@@ -126,3 +126,8 @@ def test_solution_4_by_4():
 def test_solution_should_throw_invalid_board_error():
     with pytest.raises(InvalidBoardError):
         solution(8, -1, [1, 2, 3, 4, 5, 6, 8, 0, 7])
+
+
+def test_solution_4_by_4_should_throw_invalid_board_error():
+    with pytest.raises(InvalidBoardError):
+        solution(15, -1, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 14, 0])
