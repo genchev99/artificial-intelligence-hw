@@ -3,8 +3,6 @@ import math
 import time
 from functools import cached_property
 
-IDA_THRESHOLD_LIMIT = 200000
-
 
 class Turn:
     left = 'left'
@@ -18,14 +16,31 @@ def swap(l: list, source: int, destination: int):
     return l
 
 
+def get_number_of_inversions_without_zero(l: list):
+    inversions_count = 0
+    length = len(l)
+
+    for i in range(length):
+        for j in range(i + 1, length):
+            if l[j] != 0 and l[i] > l[j]:
+                inversions_count += 1
+
+    return inversions_count
+
+
+class InvalidBoardError(Exception):
+    """
+    Thrown when the board is invalid
+    """
+    pass
+
+
 class MatrixHelper:
     expected_zero_position = -1
 
     def __init__(self, numbers: list):
         self.__side_length = int(len(numbers) ** 0.5)
         self.__numbers = numbers
-
-        self.__validate_board()
 
     def __get_expected_position_for_number(self, number) -> int:
         if number == 0:
@@ -70,9 +85,16 @@ class MatrixHelper:
         order = self.__numbers.copy()
         return swap(order, self.__current_zero_position, moved_zero_position)
 
-    def __validate_board(self):
-        # TODO: implement validation
-        pass
+    def validate_board(self):
+        number_of_inversions = get_number_of_inversions_without_zero(self.__numbers)
+        if self.__side_length % 2 == 1 and number_of_inversions % 2 == 1:
+            raise InvalidBoardError("The board cannot have odd number of inversions when the size is odd")
+
+        if self.__side_length % 2 == 0:
+            zero_row, _ = self.__position_to_coords(self.__current_zero_position)
+
+            if (zero_row + number_of_inversions) % 2 == 0:
+                raise InvalidBoardError("The board cannot even number of inversions + row with zero if the size is even")
 
     def iter_successor(self):
         zero_x, zero_y = self.__position_to_coords(self.__current_zero_position)
@@ -119,13 +141,6 @@ class Tree:
 
     def __str__(self):
         return f"Nodes: {', '.join([str(node) for key, node in self.nodes.items()])}\nEdges: {json.dumps(self.edges, indent=2)}"
-
-
-class ThresholdSurpassedException(Exception):
-    """
-    Thrown when the threshold has been surpassed
-    """
-    pass
 
 
 def iterative_deepening_a_star_rec(tree, node: Node, visited: set, directions: list, distance, threshold):
@@ -183,13 +198,12 @@ def iterative_deepening_a_star(tree: Tree, start: Node):
             threshold=threshold
         )
 
-        if distance <= 0:
-            return -distance, directions
-        elif 0 < distance < IDA_THRESHOLD_LIMIT:
-            # prevents stucking on unsolvable puzzles
-            threshold = distance
-        else:
+        if distance == math.inf:
             return -1, []
+        elif distance <= 0:
+            return -distance, directions
+        elif 0 < distance:
+            threshold = distance
 
 
 def solution(n: int, expected_zero_index: int, numbers: list) -> tuple:
@@ -204,8 +218,11 @@ def solution(n: int, expected_zero_index: int, numbers: list) -> tuple:
 
     # init tree
     matrix = MatrixHelper(numbers)
+    matrix.validate_board()
+
     start = Node(matrix)
     tree = Tree(start)
+
     return iterative_deepening_a_star(tree, start)
 
 

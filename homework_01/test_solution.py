@@ -1,4 +1,6 @@
-from homework_01.solution import solution, Turn
+import pytest
+
+from homework_01.solution import solution, Turn, InvalidBoardError
 
 
 def test_solution_with_provided_example():
@@ -119,3 +121,8 @@ def test_solution_4_by_4():
         Turn.left,
         Turn.left,
     ]
+
+
+def test_solution_should_throw_invalid_board_error():
+    with pytest.raises(InvalidBoardError):
+        solution(8, -1, [1, 2, 3, 4, 5, 6, 8, 0, 7])
