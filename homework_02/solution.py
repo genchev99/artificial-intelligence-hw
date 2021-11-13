@@ -81,17 +81,7 @@ class ChessBoard:
         moves = 0
         while True:
             # We calculate the sum of all conflict count per queen on the board
-            conflicts = 0
-            queen_to_move = -1
-            queen_to_move_conflicts = 0
-
-            for queen_row in range(self.__board_size):
-                conflict = self.__calculate_conflicts(queen_row, self.__queens[queen_row])
-                if conflict > queen_to_move_conflicts:
-                    queen_to_move_conflicts = conflict
-                    queen_to_move = queen_row
-
-                conflicts += conflict
+            conflicts = sum([self.__calculate_conflicts(queen_row, self.__queens[queen_row]) for queen_row in range(self.__board_size)])
 
             # If that sum is equal to 0 then all queens are "in peace" and the solution is over
             if conflicts == 0:
@@ -99,7 +89,7 @@ class ChessBoard:
                 return moves
 
             # If the board has conflicts (not solved yet) we select a random a queen and then we move it to the position with min conflicts
-            # queen_to_move = random.randint(0, self.__board_size - 1)
+            queen_to_move = random.randint(0, self.__board_size - 1)
             self.__move_queen(queen_to_move)
 
             # And finally we need to increment the moves counter with one
