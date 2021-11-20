@@ -114,29 +114,14 @@ class Route:
         return Route(child)
 
 
-def breed_population(sorted_population: list, elitism_size: int = ELITISM_SIZE):
-    """
-    Returns the next generation
-    """
-    # For mating pool we'll choose 50% of most fit
-    length = len(sorted_population)
-    mating_pool = sorted_population[:length // 2]
-    next_generation = sorted_population[:elitism_size]
-
-    for _ in range(length - elitism_size):
-        parent_a, parent_b = random.sample(mating_pool, 2)
-        next_generation.append(parent_a + parent_b)
-
-    return next_generation
-
-
 class Solution:
-    POPULATION_SIZE = 100
-    ELITISM_SIZE = 5  # Retain top N members from the previous generation to the next one
-    MAX_GENERATIONS = 1000
+    POPULATION_SIZE = 10
+    ELITISM_SIZE = 1  # Retain top N members from the previous generation to the next one
+    MAX_GENERATIONS = 10
 
     def __init__(self, cities_count: int):
         self.cities_count = cities_count
+        self.current_generation = 0
         self.cities = Grid.generate_cities(cities_count)
         #  Create init population
         self.population = [Route(random.sample(self.cities, cities_count)) for _ in range(self.POPULATION_SIZE)]
@@ -145,10 +130,30 @@ class Solution:
         """
         Returns the next generation
         """
+        if self.current_generation > self.MAX_GENERATIONS:
+            raise StopIteration()
 
+        # For mating pool we'll choose 50% of most fit
+        mating_pool = self.sorted_population[:self.POPULATION_SIZE // 2]
+        next_generation = self.sorted_population[:self.ELITISM_SIZE]
+
+        for _ in range(self.POPULATION_SIZE - self.ELITISM_SIZE):
+            parent_a, parent_b = random.sample(mating_pool, 2)
+            next_generation.append(parent_a + parent_b)
+
+        self.population = next_generation
+        self.current_generation += 1
+        return self
 
     def __iter__(self):
         return self
+
+    def __str__(self):
+        return str(self.sorted_population[0])
+
+    @property
+    def sorted_population(self):
+        return sorted(self.population, reverse=True)
 
     @property
     def cities_count(self):
@@ -161,18 +166,16 @@ class Solution:
 
         self.__cities_count = val
 
-    def run(self):
-        for generation in range(self.MAX_GENERATIONS):
-            print("generation:", generation)
 
-            for p in self.population[:5]:
-                print(p)
+def solution(cities_count: int):
+    sol = Solution(cities_count)
+    for generation in sol:
+        print(generation)
 
-            self.__next__()
 
 def main():
     # cities_count = int(input("Input number cities: "))
-    solution(cities_count=5)
+    solution(cities_count=10)
 
 
 if __name__ == '__main__':
