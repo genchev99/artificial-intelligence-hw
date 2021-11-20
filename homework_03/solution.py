@@ -113,18 +113,29 @@ class Route:
 
         return Route(child)
 
+    def mutate(self, mutation_rate: float):
+        """
+        Mutation in this case will swap 2 cities
+        """
+        if random.random() < mutation_rate:
+            length = len(self.route)
+            a = random.randrange(length)
+            b = random.randrange(length)
+            self.route[a], self.route[b] = self.route[b], self.route[a]
+
 
 class Solution:
-    POPULATION_SIZE = 10
-    ELITISM_SIZE = 1  # Retain top N members from the previous generation to the next one
-    MAX_GENERATIONS = 10
+    POPULATION_SIZE = 30
+    ELITISM_SIZE = 3  # Retain top N members from the previous generation to the next one
+    MAX_GENERATIONS = 1000
+    MUTATION_RATE = 0.05
 
     def __init__(self, cities_count: int):
         self.cities_count = cities_count
         self.current_generation = 0
         self.cities = Grid.generate_cities(cities_count)
-        #  Create init population
-        self.population = [Route(random.sample(self.cities, cities_count)) for _ in range(self.POPULATION_SIZE)]
+        #  Create init population and it's always stored as sorted list
+        self.population = sorted([Route(random.sample(self.cities, cities_count)) for _ in range(self.POPULATION_SIZE)], reverse=True)
 
     def __next__(self):
         """
@@ -134,26 +145,28 @@ class Solution:
             raise StopIteration()
 
         # For mating pool we'll choose 50% of most fit
-        mating_pool = self.sorted_population[:self.POPULATION_SIZE // 2]
-        next_generation = self.sorted_population[:self.ELITISM_SIZE]
+        mating_pool = self.population[:self.POPULATION_SIZE // 2]
+        next_generation = self.population[:self.ELITISM_SIZE]
 
         for _ in range(self.POPULATION_SIZE - self.ELITISM_SIZE):
             parent_a, parent_b = random.sample(mating_pool, 2)
             next_generation.append(parent_a + parent_b)
 
-        self.population = next_generation
+        self.population = sorted(next_generation, reverse=True)
+        self.mutate_population()
         self.current_generation += 1
         return self
 
     def __iter__(self):
         return self
 
-    def __str__(self):
-        return str(self.sorted_population[0])
+    def mutate_population(self):
+        for route in self.population:
+            route.mutate(self.MUTATION_RATE)
 
     @property
-    def sorted_population(self):
-        return sorted(self.population, reverse=True)
+    def fittest_distance(self):
+        return self.population[0].distance
 
     @property
     def cities_count(self):
@@ -169,13 +182,16 @@ class Solution:
 
 def solution(cities_count: int):
     sol = Solution(cities_count)
+    prev = None
     for generation in sol:
-        print(generation)
+        if prev != generation.fittest_distance:
+            print("generation:", str(generation.current_generation).zfill(3), "min distance:", generation.fittest_distance)
+            prev = generation.fittest_distance
 
 
 def main():
     # cities_count = int(input("Input number cities: "))
-    solution(cities_count=10)
+    solution(cities_count=100)
 
 
 if __name__ == '__main__':
