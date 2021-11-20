@@ -139,7 +139,7 @@ class Route:
 
 
 class Solution:
-    POPULATION_SIZE = 30
+    POPULATION_SIZE = 100
     ELITISM_SIZE = 3  # Retain top N members from the previous generation to the next one
     MAX_GENERATIONS = 1000
     MUTATION_RATE = 0.05
