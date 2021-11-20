@@ -5,7 +5,7 @@ from functools import cached_property
 
 
 class City:
-    def __init__(self, pos_width: int, pos_height: int):
+    def __init__(self, pos_width: float, pos_height: float):
         self.pos_width = pos_width
         self.pos_height = pos_height
 
@@ -46,6 +46,20 @@ class Grid:
         Generates N unique cities represented as tuples where N is equal to cities_count
         """
         cities = set()
+
+        # Presented test case
+        # cities.add(City(0.190032E-03, -0.285946E-03))
+        # cities.add(City(383.458, -0.608756E-03))
+        # cities.add(City(-27.0206, -282.758))
+        # cities.add(City(335.751, -269.577))
+        # cities.add(City(69.4331, -246.780))
+        # cities.add(City(168.521, 31.4012))
+        # cities.add(City(320.350, -160.900))
+        # cities.add(City(179.933, -318.031))
+        # cities.add(City(492.671, -131.563))
+        # cities.add(City(112.198, -110.561))
+        # cities.add(City(306.320, -108.090))
+        # cities.add(City(217.343, -447.089))
 
         while len(cities) != cities_count:
             cities.add(cls.generate_random_city())
@@ -190,8 +204,8 @@ def solution(cities_count: int):
 
 
 def main():
-    # cities_count = int(input("Input number cities: "))
-    solution(cities_count=100)
+    cities_count = int(input("Input number cities: "))
+    solution(cities_count)
 
 
 if __name__ == '__main__':
