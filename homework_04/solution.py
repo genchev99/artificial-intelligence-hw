@@ -48,6 +48,18 @@ class TicTacToe:
         return True
 
     @property
+    def level(self):
+        count = 0
+        for row in self.matrix:
+            count += sum([1 for x in row if not x == Player.empty])
+
+        return count
+
+    @property
+    def score(self):
+        return (self.size ** 2) + 1 - self.level
+
+    @property
     def primary_diagonal(self) -> list:
         return [self.matrix[i][i] for i in range(self.size)]
 
@@ -120,15 +132,15 @@ class TicTacToe:
 
 def mm_max(board: TicTacToe, alpha, beta):
     if board.is_player_winning(Player.x):
-        return -1, board.matrix
+        return -board.score, board.matrix
 
     if board.is_player_winning(Player.o):
-        return 1, board.matrix
+        return board.score, board.matrix
 
     if board.is_tie():
         return 0, board.matrix
 
-    max_value = -2
+    max_value = float("-inf")
     alt = board.matrix
 
     for alternation in board.iter_possible_alternations():
@@ -150,15 +162,15 @@ def mm_max(board: TicTacToe, alpha, beta):
 
 def mm_min(board: TicTacToe, alpha, beta):
     if board.is_player_winning(Player.x):
-        return -1, board.matrix
+        return -board.score, board.matrix
 
     if board.is_player_winning(Player.o):
-        return 1, board.matrix
+        return board.score, board.matrix
 
     if board.is_tie():
         return 0, board.matrix
 
-    min_value = 2
+    min_value = float("inf")
     alt = board.matrix
 
     for alternation in board.iter_possible_alternations():
@@ -205,7 +217,7 @@ def game_loop(on_turn: str):
                 tic_tac_toe.mark_position(row, col)
                 break
         else:
-            _, alt = mm_max(tic_tac_toe, -2, 2)
+            _, alt = mm_max(tic_tac_toe, float("-inf"), float("inf"))
             tic_tac_toe.matrix = alt
 
         tic_tac_toe.next_player()
