@@ -90,11 +90,11 @@ def iter_k_fold(data: list, k: int = K_FOLD) -> Generator:
         yield data[0:test_from] + data[test_to:], data[test_from:test_to]
 
 
-def likeliness(data: list, attribute: str, option: str):
+def likeliness(data: list, attribute: str, option: str, alpha: int = 1):
     for d in data:
         if d.get(attribute) is None:
             print(d)
-    return sum(1 for d in data if d[attribute] == option) / len(data)
+    return (sum(1 for d in data if d[attribute] == option) + alpha) / len(data)
 
 
 def likeliness_for_attr(data: list, attribute: str):
@@ -169,9 +169,6 @@ def classify_test(train_info: dict, record: dict) -> bool:
 def solution():
     data = read_data()
 
-    # for fold in iter_k_fold(list(range(12)), 3):
-    #     print("fold: ", fold)
-
     accuracies = []
     for train_data, test_data in iter_k_fold(data):
         train_info = train(train_data)
@@ -180,6 +177,7 @@ def solution():
 
         accuracy = positive_guesses / length_of_test_data
         accuracies.append(accuracy)
+
         print("Accuracy: {:.5f}".format(accuracy))
 
     print("Average Accuracy: {:.5f}".format(sum(accuracies) / len(accuracies)))
