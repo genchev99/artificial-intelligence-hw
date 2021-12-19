@@ -1,7 +1,12 @@
-# Artificial intelligence homeworks
+# In memory of Borislav Dimitrov (2000-2021)
 
-This repository contains homework solutions from the FMI
-course `Artificial intelligence 2021/2022`.
+For all the exercises that we did together! Rest in peace bobka!
+
+![bobkata](./images/bobkata.jpg)
+
+## Artificial intelligence homeworks
+
+This repository contains homework solutions from the FMI course `Artificial intelligence 2021/2022`.
 
 ## Dev setup
 
@@ -11,8 +16,7 @@ course `Artificial intelligence 2021/2022`.
 
 ## Tests
 
-All solutions will be tested with unit tests. In order to run them you need to run the
-following command from the root directory.
+All solutions will be tested with unit tests. In order to run them you need to run the following command from the root directory.
 
 ```bash
 # from the command line
