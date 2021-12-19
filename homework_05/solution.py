@@ -1,5 +1,4 @@
 import csv
-import json
 from typing import Generator
 
 DATA_PATH = "./data/voting_records.csv"
