@@ -90,7 +90,7 @@ def iter_k_fold(data: list, k: int = K_FOLD) -> Generator:
 
 
 def likeliness(data: list, attribute: str, option: str, alpha: int = 1):
-    return (sum(1 for d in data if d[attribute] == option) + alpha) / len(data)
+    return (sum(1 for d in data if d[attribute] == option) + alpha) / (len(data) + alpha)
 
 
 def likeliness_for_attr(data: list, attribute: str):
