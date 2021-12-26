@@ -183,8 +183,7 @@ def id3_rec(data: list, available_attributes: list, node: Node):
         return node
 
     if entropy(data) == 0 or not available_attributes:
-        # TODO: change
-        node.value = data[0]["class"]
+        node.value = majority_class(data)
         node.type = NodeTypes.leaf
         return node
 
@@ -254,12 +253,7 @@ def solution():
     for train_data, test_data in iter_k_fold(data):
         root = id3(train_data)
         # display(root)
-        positive_hits = 0
-        for d in test_data:
-            # print(d)
-            if eval_record_decision_tree(root, d):
-                positive_hits += 1
-        # positive_hits = sum([1 for d in test_data if eval_record_decision_tree(root, d)])
+        positive_hits = sum([1 for d in test_data if eval_record_decision_tree(root, d)])
         accuracy = positive_hits / len(test_data)
         total_accuracy.append(accuracy)
         print(f"Accuracy: {accuracy}")
