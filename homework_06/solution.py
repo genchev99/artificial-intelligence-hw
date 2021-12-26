@@ -5,7 +5,8 @@ from typing import Generator
 
 DATA_PATH = "data/breast_cancer.csv"
 K_FOLD = 10
-K_DATA_PRUNING = 6
+K_DATA_LENGTH_PRUNING = 6
+K_DATA_DEPTH_PRUNING = 7
 
 
 class Classes:
@@ -162,6 +163,8 @@ def display(curr, level=0):
 def id3(data: list):
     root = Node()
     id3_rec(data, available_attributes=list(Attributes.iter()), node=root)
+    # This is the alternative pruning part! Comment the line above and uncomment the one below
+    # id3_rec_alternative_pruning(data, available_attributes=list(Attributes.iter()), node=root)
 
     return root
 
@@ -176,7 +179,7 @@ def majority_class(data: list) -> str:
 
 
 def id3_rec(data: list, available_attributes: list, node: Node):
-    if len(data) <= K_DATA_PRUNING:
+    if len(data) <= K_DATA_LENGTH_PRUNING:
         # Missing data pruning
         node.type = NodeTypes.leaf
         node.value = majority_class(data)
@@ -199,6 +202,33 @@ def id3_rec(data: list, available_attributes: list, node: Node):
         node.children.append(child)
         sub_data = [d for d in data if d[best_attr] == option]
         child.children = [id3_rec(sub_data, rest_attr, Node())]
+
+    return node
+
+
+def id3_rec_alternative_pruning(data: list, available_attributes: list, node: Node):
+    if len(available_attributes) < K_DATA_DEPTH_PRUNING:
+        node.type = NodeTypes.leaf
+        node.value = majority_class(data)
+        return node
+
+    if entropy(data) == 0:
+        node.value = majority_class(data)
+        node.type = NodeTypes.leaf
+        return node
+
+    best_attr, rest_attr = best_gain(data, available_attributes)
+    node.value = best_attr
+    node.type = NodeTypes.attr
+
+    for option in AttributeOptions.iter(best_attr):
+        child = Node()
+        child.value = option
+        child.type = NodeTypes.option
+
+        node.children.append(child)
+        sub_data = [d for d in data if d[best_attr] == option]
+        child.children = [id3_rec_alternative_pruning(sub_data, rest_attr, Node())]
 
     return node
 
