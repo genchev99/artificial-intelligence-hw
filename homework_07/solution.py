@@ -22,7 +22,7 @@ def read_data(dataset: str) -> list:
         return [(float(x), float(y)) for x, y in reader]
 
 
-def plot(centroids: list, file: str = "plot.png"):
+def plot(centroids: list):
     colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
     plt.xlabel('x')
     plt.ylabel('y')
@@ -110,7 +110,7 @@ def k_means(data: list, clusters_amount: int, max_iterations: int = 100) -> list
     centroids = [Centroid(centroid_coords) for centroid_coords in random.sample(data, clusters_amount)]
 
     for iteration in range(max_iterations):
-        print("iteration: ", iteration)
+        # print("iteration: ", iteration)
         # classify the points
         for point in data:
             centroid, _ = min(zip(centroids, [distance(centroid.center, point) for centroid in centroids]), key=itemgetter(1))
